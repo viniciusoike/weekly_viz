@@ -1,1 +1,53 @@
-# weekly_viz
+# Data Visualization 
+
+When I have some free time on my hands I like to explore some interesting topic. This project started as a spinoff of #TidyTuesday so I tried to keep the weekly updates and the tidyverse spirit.
+
+Most of my visualizations are about economics, Brazil, and São Paulo.
+
+# 2021
+
+## November
+
+- [Road Accidents in Sao Paulo](https://github.com/viniciusoike/tidy_tuesday/blob/main/R/t-11-02)
+
+## October
+
+- [Unemployment in Brazil and Sao Paulo](https://github.com/viniciusoike/tidy_tuesday/blob/main/R/t-10-26)
+
+- [Skycrapers in Sao Paulo](https://github.com/viniciusoike/tidy_tuesday/blob/main/graphics/2020_10)
+
+- [Global Warming](https://github.com/viniciusoike/tidy_tuesday/blob/main/graphics/2020_10)
+
+## September
+
+- [Family Income Distribution in Sao Paulo](https://github.com/viniciusoike/tidy_tuesday/blob/main/graphics/2020_10)
+
+
+***
+
+# Plots
+
+## Car Accidents in Sao Paulo
+
+![](https://github.com/viniciusoike/tidy_tuesday/blob/main/graphics/2021_11/map_road_accidents_2020.png?raw=true)
+
+![](https://github.com/viniciusoike/tidy_tuesday/blob/main/graphics/2021_11/road_accidents_2.png?raw=true)
+
+
+## Unemployment in Brazil and Sao Paulo
+
+![](https://github.com/viniciusoike/tidy_tuesday/blob/main/graphics/2021_10/unemployment_1.png?raw=true)
+
+![](https://github.com/viniciusoike/tidy_tuesday/blob/main/graphics/2021_10/unemployment_panel.png?raw=true)
+
+## Skyscrapers in Sao Paulo
+
+![.graphics/2020_10_sao_paulo_mapa_renda.png](https://github.com/viniciusoike/tidy_tuesday/blob/main/graphics/2021_10/skycraper_sp_panel.png?raw=true)
+
+## Global Warming
+
+![](https://github.com/viniciusoike/tidy_tuesday/blob/main/graphics/2021_10/global_warming_economist_cairo.png?raw=true)
+
+## Family Income Distribution in Sao Paulo
+
+![](https://github.com/viniciusoike/tidy_tuesday/blob/main/graphics/2021_10/sao_paulo_renda.png?raw=true)

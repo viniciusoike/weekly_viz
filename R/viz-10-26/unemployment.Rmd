@@ -1,0 +1,337 @@
+---
+title: "TT 10-22 - Unemployment"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::robobook:
+    highlight: kate
+---
+
+
+```{r setup, include=FALSE}
+library(knitr)
+library(rmdformats)
+library(here)
+
+## Global options
+options(max.print="75")
+opts_chunk$set(echo=FALSE,
+	             cache=TRUE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE,
+               fig.align="center")
+opts_knit$set(width=75)
+```
+
+
+```{r libraries}
+library(tidyverse)
+library(sidrar)
+library(forecast)
+library(showtext)
+showtext_opts(dpi = 300)
+showtext_auto()
+```
+
+```{r}
+colors <- c("#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51")
+
+get_trend <- function(df) {
+  
+  s1 <- min(lubridate::year(df$date))
+  s2 <- min(lubridate::quarter(df$date))
+  y <- df$value
+  
+  serie <- ts(y, start = c(s1, s2), frequency = 4)
+  
+  model.stl <- mstl(serie)
+  trend.stl <- trendcycle(model.stl)
+  
+  out <- tibble(
+    date = df$date,
+    original = as.numeric(serie),
+    trend = as.numeric(trend.stl)
+  )
+  
+  return(out)
+  
+}
+
+theme_vini <-   theme_minimal() +
+  theme(legend.position = "bottom",
+        text = element_text(family = "Roboto", size = 10),
+        axis.text = element_text(family = "Roboto", colour = "gray10"),
+        plot.title = element_text(family = "Roboto", size = 14, face = "bold"),
+        plot.subtitle = element_text(family = "Roboto", size = 8)
+        )
+```
+
+
+```{r data-import, results='hide'}
+# Import IBGE identification data for all UFs (states)
+ufid <- geobr::read_state()
+ufid <- sf::st_drop_geometry(ufid)
+ufid <- mutate(ufid, name_state = str_replace(name_state,
+                                              "Espirito Santo",
+                                              "Espírito Santo"))
+# Import data using SIDRA API
+
+# Country-level unemployment
+unemp_br <- get_sidra(4099, period = "201901-202102", geo = "Brazil")
+# Unemployment rate by state
+unemp <- get_sidra(4099, period = "201901-202102", geo = "State")
+```
+
+```{r data-clean}
+## State -------------------------------------------------------------------
+
+unemp <- unemp %>%
+  as_tibble() %>%
+  # Rename variables
+  janitor::clean_names() %>%
+  rename(
+    code_state = unidade_da_federacao_codigo,
+    name_state = unidade_da_federacao,
+    value = valor
+  ) %>%
+  # Filter only unemployment rate
+  filter(variavel_codigo %in% c(4099, 4118)) %>%
+  # Convert quarter date to Date
+  mutate(
+    date = zoo::as.Date(zoo::as.yearqtr(trimestre_codigo, "%Y%q")),
+    code_state = as.numeric(code_state)
+  ) %>%
+  # Select columns
+  select(date, code_state, variavel_codigo, value) %>%
+  # Join with UF identifiers
+  left_join(ufid, by = c("code_state"))
+
+## Brazil ------------------------------------------------------------------
+
+unemp_br <- unemp_br %>%
+  as_tibble() %>%
+  # Rename variables
+  janitor::clean_names() %>%
+  rename(
+    name_state = brasil,
+    value = valor
+  ) %>%
+  # Filter only unemployment rate
+  filter(variavel_codigo %in% c(4099, 4118)) %>%
+  # Convert quarter date to Date
+  mutate(
+    date = zoo::as.Date(zoo::as.yearqtr(trimestre_codigo, "%Y%q")),
+    code_state = 1,
+    abbrev_state = "BR",
+  ) %>%
+  # Select columns
+  select(date, code_state, variavel_codigo, name_state, abbrev_state, value)
+
+
+## Tables ------------------------------------------------------------------
+
+unemp_full <- list(unemp, unemp_br) %>%
+  map(filter, variavel_codigo == 4099) %>%
+  bind_rows()
+
+subwork_full <- list(unemp, unemp_br) %>%
+  map(filter, variavel_codigo == 4118) %>%
+  bind_rows()
+
+# Get pre and post pandemic data
+unemp_compare <- unemp_full %>%
+  filter(!is.na(value),
+         date == as.Date("2019-04-01") | date == as.Date("2021-04-01")) %>%
+  mutate(
+    abbrev_state = factor(abbrev_state),
+    abbrev_state = fct_reorder(abbrev_state, code_state)
+  )
+
+unemp_aux <- unemp_compare %>%
+  pivot_wider(id_cols = "abbrev_state",
+              names_from = "date",
+              values_from = "value") %>%
+  rename(y = `2019-04-01`, yend = `2021-04-01`) %>%
+  mutate(diff = yend - y,
+         diff_perc = (yend / y - 1) * 100)
+
+
+## Trend -------------------------------------------------------------------
+
+trend <- map(split(unemp_full, unemp_full$abbrev_state), get_trend)
+
+unemp_trend <- bind_rows(trend, .id = "abbrev_state")
+
+unemp_trend <- trend %>%
+  bind_rows(.id = "abbrev_state") %>%
+  mutate(
+    highlight = if_else(abbrev_state %in% c("SP", "BR", "AL", "SC", "MG"),
+                        abbrev_state,
+                        NA_character_)
+  )
+```
+
+
+
+```{r plots}
+
+# Plots -------------------------------------------------------------------
+
+subtitle <- "Only Santa Catarina (SC), Amapa (AP), and Roraima (RR) are in a better situation.\nNortheast region suffered the most with Pernambuco, PE (5.6 p.p. rise),\nAlagoas, AL (4.2 p.p. rise), and Ceara, CE (4.1 p.p. rise).\nBrazil's average unemployment is 14.1% (2.1 p.p. rise)."
+
+p1 <- ggplot() +
+  geom_segment(
+    data = unemp_aux,
+    aes(x = abbrev_state, xend = abbrev_state, y = y, yend = yend)
+  ) +
+  geom_point(
+    data = unemp_compare,
+    aes(x = abbrev_state, y = value, colour = as.factor(date)),
+    size = 2) +
+  scale_colour_manual(
+    name = "",
+    values = colors[c(1, 5)],
+    labels = c("Pre-pandemic (2019/Q2)", "Most recent (2021/Q2)")
+  ) +
+  scale_y_continuous(
+    breaks = seq(5, 22, 1),
+    limits = c(5, 22.5)
+  ) +
+  labs(
+    title = "Unemployment Variation",
+    subtitle = subtitle,
+    y = "%",
+    x = NULL
+  ) +
+  coord_flip() +
+  theme_vini
+
+p2 <- ggplot() +
+  geom_line(
+    data = filter(unemp_trend, is.na(highlight)),
+    aes(x = date, y = trend, group = abbrev_state),
+    alpha = 0.4,
+    colour = "gray50"
+  ) +
+  geom_line(
+    data = filter(unemp_trend, !is.na(highlight)),
+    aes(x = date, y = trend, colour = factor(highlight), group = abbrev_state),
+    size = 1.2
+  ) +
+  geom_point(
+    data = filter(unemp_trend, !is.na(highlight)),
+    aes(x = date, y = trend, colour = factor(highlight), group = abbrev_state)
+  ) +
+  scale_colour_manual(
+    name = "",
+    values = c(colors[1:5])) +
+  labs(
+    x = NULL,
+    y = "%",
+    title = "Trends in Unemployment",
+    subtitle = "Seasonal-trend decomposition using Loess"
+  ) +
+  theme_vini
+
+
+p3 <- list(subwork_full, unemp_full) %>%
+  map(filter, abbrev_state == "SP") %>%
+  bind_rows() %>%
+  ggplot(aes(x = date, y = value, fill = variavel_codigo)) +
+  geom_col(
+    position = "dodge"
+  ) +
+  geom_hline(yintercept = 0) +
+  scale_x_date(
+    date_breaks = "3 month",
+    date_labels = "%Y-%m"
+  ) +
+  scale_y_continuous(
+    breaks = seq(0, 30, 5)
+  ) +
+  scale_fill_manual(
+    name = "",
+    values = colors[1:2],
+    labels = c("Unemployment", "Combined Underuse of Work-force")
+  ) +
+  labs(
+    x = NULL,
+    y = "%",
+    title = "Trend in Unemployment (SP)"
+  ) +
+  theme_vini +
+  theme(axis.text.x = element_text(angle = 90))
+
+p4 <- list(subwork_full, unemp_full) %>%
+  map(filter, abbrev_state == "BR") %>%
+  bind_rows() %>%
+  ggplot(aes(x = date, y = value, fill = variavel_codigo)) +
+  geom_col(
+    position = "dodge"
+  ) +
+  geom_hline(yintercept = 0) +
+  scale_x_date(
+    date_breaks = "3 month",
+    date_labels = "%Y-%m"
+  ) +
+  scale_y_continuous(
+    breaks = seq(0, 30, 5)
+  ) +
+  scale_fill_manual(
+    name = "",
+    values = colors[1:2],
+    labels = c("Unemployment", "Combined Underuse of Work-force")
+  ) +
+  labs(
+    x = NULL,
+    y = "%",
+    title = "Trend in Unemployment (BR)"
+  ) +
+  theme_vini +
+  theme(axis.text.x = element_text(angle = 90))
+
+```
+
+```{r, fig.showtext=T, fig.retina=1, fig.height=8}
+p1
+```
+
+```{r, fig.showtext=T, fig.retina=1}
+p2
+```
+
+```{r, fig.showtext=T, fig.retina=1}
+p3
+```
+
+```{r, fig.showtext=T, fig.retina=1}
+p4
+```
+
+```{r export}
+
+cowplot::save_plot(filename = here("graphics/2021_10/unemployment_1.png"),
+                   plot = p1,
+                   base_height = 8,
+                   base_width = 5,
+                   dpi = 300)
+
+plots <- list(p2, p3, p4)
+
+for (i in seq_along(plots)) {
+  file_path <- here("graphics", "2021_10", paste0("unemployment_", i + 1, ".png"))
+  cowplot::save_plot(file_path, plots[[i]], base_width = 3.5, dpi = 300)
+}
+library(patchwork)
+panel <- p2 / (p3 + p4)
+
+cowplot::save_plot(here("graphics/2021_10/unemployment_panel.png"),
+                   plot = panel,
+                   base_height = 7,
+                   base_width = 7,
+                   dpi = 300)
+
+```
+
