@@ -6,6 +6,10 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 
 # 2021
 
+## December
+
+- [Thefts in Sao Paulo](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-12-30/full_code.R)
+
 ## November
 
 - [Road Accidents in Sao Paulo](https://github.com/viniciusoike/tidy_tuesday/blob/main/R/t-11-02)
@@ -26,6 +30,10 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 ***
 
 # Plots
+
+## Thefts in Sao Paulo
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2021_12/roubos_furtos_panel.png?raw=true)
 
 ## Car Accidents in Sao Paulo
 
