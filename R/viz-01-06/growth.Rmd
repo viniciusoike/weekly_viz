@@ -19,6 +19,7 @@ knitr::opts_chunk$set(cache = TRUE,
 ```{r}
 library(tidyverse)
 library(ggfx)
+library(patchwork)
 library(here)
 library(rvest)
 library(WDI)
@@ -359,6 +360,12 @@ for (i in seq_along(plots)) {
   path_file <- here::here("graphics", "2022_01", name_file)
   cowplot::save_plot(path_file, plots[[i]])
 }
+
+panel <- (p1 + p2) / p3
+
+cowplot::save_plot(here::here("graphics", "2022_01", "panel.png"),
+                   panel,
+                   base_height = 6)
 
 ```
 
