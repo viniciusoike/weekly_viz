@@ -21,7 +21,10 @@ opts_chunk$set(echo=FALSE,
                comment=NA,
                message=FALSE,
                warning=FALSE,
-               fig.align="center")
+               fig.align="center",
+               fig.showtext = TRUE,
+               fig_retina = 1,
+               dev="CairoPNG")
 opts_knit$set(width=75)
 ```
 
@@ -33,9 +36,6 @@ library(forecast)
 library(showtext)
 
 font_add_google("Roboto", "Roboto")
-
-showtext_opts(dpi = 300)
-showtext_auto()
 ```
 
 ```{r}

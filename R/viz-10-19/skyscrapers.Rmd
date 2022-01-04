@@ -19,7 +19,9 @@ opts_chunk$set(echo=FALSE,
                tidy=TRUE,
                comment=NA,
                message=FALSE,
-               warning=FALSE)
+               warning=FALSE,
+               fig.showtext = TRUE,
+               fig_retina = 1)
 opts_knit$set(width=75)
 ```
 
@@ -30,8 +32,6 @@ library(cowplot)
 library(RcppRoll)
 library(showtext)
 library(here)
-showtext_opts(dpi = 300)
-showtext_auto()
 
 colors <- c("#264653", "#2A9D8F", "#E9C46A", "#F4A261", "#E76F51")
 
