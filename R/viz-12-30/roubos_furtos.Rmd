@@ -33,8 +33,8 @@ theme_vini <- theme_minimal() +
     panel.grid.minor.y = element_blank(),
     panel.grid.minor.x = element_blank(),
     
-    panel.background = element_rect(fill = "white"),
-    plot.background = element_rect(fill = "white")
+    panel.background = element_rect(fill = "white", colour = NULL),
+    plot.background = element_rect(fill = "white", colour = NULL)
   )
 ```
 
