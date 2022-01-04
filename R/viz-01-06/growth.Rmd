@@ -1,8 +1,8 @@
 ---
-title: "Growth"
+title: "01-06 - Growth in Brazil and Latin America"
 date: "`r Sys.Date()`"
 output:
-  rmdformats::html_clean:
+  rmdformats::robobook:
     highlight: kate
 ---
 ```{r setup, include=FALSE}
@@ -392,11 +392,11 @@ p1
 p2
 ```
 
-```{r, fig.height=10, fig.width=6}
+```{r, fig.height=7, fig.width=7}
 p3
 ```
 
-```{r}
+```{r, fig.height=7.5, fig.width=7.5}
 p4
 ```
 

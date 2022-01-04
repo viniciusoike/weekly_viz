@@ -1,5 +1,5 @@
 ---
-title: "TT 10-22 - Unemployment"
+title: "10-22 - Unemployment"
 date: "`r Sys.Date()`"
 output:
   rmdformats::robobook:
@@ -329,8 +329,8 @@ panel <- p2 / (p3 + p4)
 
 cowplot::save_plot(here("graphics/2021_10/unemployment_panel.png"),
                    plot = panel,
-                   base_height = 7,
-                   base_width = 7,
+                   base_height = 5,
+                   base_width = 5,
                    dpi = 300)
 
 ```
