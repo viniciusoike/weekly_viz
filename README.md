@@ -39,7 +39,13 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 
 ## Growth in Brazil
 
-![]()
+### GDP per capita growth in Brazil
+
+![](https://raw.githubusercontent.com/viniciusoike/weekly_viz/main/graphics/2022_01/panel.png)
+
+### Latin America Panel
+
+![](https://raw.githubusercontent.com/viniciusoike/weekly_viz/main/graphics/2022_01/p3.png)
 
 ![](https://raw.githubusercontent.com/viniciusoike/weekly_viz/main/graphics/2022_01/p4.png)
 

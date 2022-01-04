@@ -352,6 +352,8 @@ p5 <- ggplot() +
   )
 ```
 
+
+
 ```{r export}
 plots <- list(p1, p2, p3, p4, p5)
 
@@ -361,13 +363,22 @@ for (i in seq_along(plots)) {
   cowplot::save_plot(path_file, plots[[i]])
 }
 
-panel <- (p1 + p2) / p3
+```
+
+```{r}
+p5 <- p5 + labs(
+      title = "GDP Per Capita Gap in relation to USA",
+    subtitle = "Over the 60 year period, Puerto Rico closed the gap the most (+16,6) while Argentina lost track (-19.1). Brazil started catching up in the 1970s but stagnated and has barely changed in the overall period (+0.3).\nChile exhibited solid growth from 1985 to 2012 (+11.6) but has since slowed down.",
+    x = NULL,
+    y = "(%)"
+)
+panel <- p5 / (p1 + p2) + plot_layout(heights = c(1.35, 1))
 
 cowplot::save_plot(here::here("graphics", "2022_01", "panel.png"),
                    panel,
-                   base_height = 6)
-
+                   base_height = 8)
 ```
+
 
 # Plots
 
