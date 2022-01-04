@@ -378,7 +378,8 @@ panel <- p5 / (p1 + p2) + plot_layout(heights = c(1.35, 1))
 
 cowplot::save_plot(here::here("graphics", "2022_01", "panel.png"),
                    panel,
-                   base_height = 8)
+                   base_width = 6,
+                   base_height = 6.5)
 ```
 
 
