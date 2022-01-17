@@ -8,6 +8,8 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 
 ## January
 
+- [Recessions in Brazil](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-01-13)
+
 - [Growth in Brazil and Latin America](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-01-06)
 
 # 2021
@@ -36,6 +38,14 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 ***
 
 # Plots
+
+## Recessions in Brazil
+
+* Since 1996, Brazil faced 5 recessions, including the most recent Covid-19 recession. Notably, the 2008-09 Financial Crisis had only a mild effect on the Brazilian economy: technically, the slump lasted only two quarters, and after 4 quarters GDP was already higher then pre-recession levels. The most severe recession in recent record was the 2014-16 recession. According to CODACE (Brazilian Business Cycle Dating Committee) it was the largest cumulative drop in %GDP since 1980 and it lasted 11 quarters. Even though the boom is technically over, the Brazilian economy is still **bellow** pre-2014 levels of activity.
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/recessores_brasil_cairo.png?raw=true)
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/queda_e_recuperacao_brasil_cairo.png?raw=true)
 
 ## Growth in Brazil
 
