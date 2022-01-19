@@ -28,7 +28,7 @@ theme_vini <- theme(
   # Eixos
   axis.text.y = element_text(vjust = .4),
   axis.ticks = element_line(size = .4),
-  axis.text = element_text(family = "Helvetica", size = 8, colour = "gray10"),
+  axis.text = element_text(family = "Helvetica", size = 10, colour = "gray10"),
   
   # Legenda
   legend.position = "top"
@@ -316,7 +316,3 @@ for (i in seq_along(plots)) {
   path_file <- here::here("graphics", "2022_01", name_file)
   cowplot::save_plot(path_file, plots[[i]])
 }
-
-path <- here::here("graphics", "2022_01", "")
-cowplot::save_plot(glue::glue("{path}.pdf"), p, device = cairo_pdf)
-
