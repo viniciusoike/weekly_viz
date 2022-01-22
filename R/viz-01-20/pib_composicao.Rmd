@@ -1,0 +1,435 @@
+---
+title: "01-20 - City GDP Decomposition"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::robobook:
+    highlight: kate
+---
+```{r setup, include=FALSE}
+## Global options
+knitr::opts_chunk$set(cache = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      error = FALSE,
+                      fig.showtext = TRUE,
+                      fig_retina = 1)
+```
+
+```{r lib-and-theme}
+library(geobr)
+library(sf)
+library(here)
+library(tidyverse)
+library(rmapshaper)
+library(RColorBrewer)
+library(MetBrewer)
+library(showtext)
+library(ggrepel)
+library(ggtext)
+
+font_add("Gill Sans", "GillSans.ttc")
+font_add("Helvetica", "Helvetica.ttc")
+showtext_auto()
+showtext_opts(dpi = 300)
+
+theme_vini <- theme(
+  
+  text = element_text(family = "Helvetica", size = 10, colour = "gray15"),
+  plot.title = element_text(size = 14),
+  plot.subtitle = element_text(size = 8, colour = "gray30"),
+  plot.caption = element_text(size = 7, colour = "gray30"),
+  
+  
+  legend.title.align = 0.5,
+  legend.title = element_text(size = 8, colour = "gray15"),
+  
+  legend.position = "bottom",
+  panel.background = element_rect(fill = "white"),
+  
+  panel.grid.major.x = element_line(colour = "gray75", size = 0.5, linetype = 2),
+  axis.ticks = element_blank()
+)
+
+
+theme_map <- theme_void() + 
+  theme(
+    # Adjust plot margins
+    plot.margin = margin(t = 0.5, b = 0.5, unit = "in"),
+    
+    # Text, title and subtitle
+
+    text = element_text(family = "Gill Sans", size = 10, colour = "gray10"),
+    strip.text = element_text(size = 14, hjust = 0.5),
+    plot.title = element_text(
+      face = "bold", size = 16, hjust = 0.5, colour = "black"
+      ),
+    plot.subtitle = element_text(size = 8, hjust = 0.5, colour = "gray20"),
+    plot.caption = element_text(size = 6),
+    # Legend
+    legend.title.align = 0.5,
+    legend.margin = margin(0, unit = "pt"),
+    legend.box.margin = margin(0, unit = "pt"),
+    legend.title = element_text(size = 8),
+    legend.text = element_text(size = 6),
+    legend.justification = c(1, 1),
+    legend.background = element_rect(colour = NA, fill = NA),
+    
+    # Background
+    panel.background = element_rect(fill = "#fff7bc", color = "#fff7bc"),
+    plot.background = element_rect(fill = "#fff7bc", color = "#fff7bc"),
+  )
+
+get_jenk_breaks <- function(x, k) {
+  
+  j <- BAMMtools::getJenksBreaks(x, k = k)
+  rank <- findInterval(x, j)
+  
+  return(rank)
+  }
+```
+
+```{r shapes-data, results='hide'}
+munis <- read_municipality()
+munis <- mutate(munis, code_muni = as.character(code_muni))
+geostate <- read_state()
+
+data <- read_csv(here("data/2022_01/pib_clean.csv"))
+```
+
+
+```{r data-clean}
+
+# Vector of cities to highlight
+cities <- c(3305505, 1400100, 3550308, 4314902, 5107925, 1505536, 1302603)
+
+# Filter only 2019 data and convert percentages
+pib2019 <- data %>%
+  filter(ano == 2019) %>%
+  mutate(
+    code_muni = as.character(code_muni),
+    flag_adm = factor(if_else(va_adm_pub_prop > 0.5, 1, 0))
+    ) %>%
+  mutate(across(starts_with("va"), .fns = ~ . * 100))
+
+# Find activity with highest value for each city
+atividade <- pib2019 %>%
+  select(
+    code_muni,va_agro_prop, va_indus_prop, va_servicos_prop, va_adm_pub_prop
+  ) %>%
+  pivot_longer(cols = -code_muni) %>%
+  group_by(code_muni) %>%
+  summarise(class_ativ = which.max(value)) %>%
+  mutate(class_ativ = factor(case_when(
+    class_ativ == 1 ~ "Agropecuária",
+    class_ativ == 2 ~ "Indústria",
+    class_ativ == 3 ~ "Serviços",
+    class_ativ == 4 ~ "Adm. Pública"
+  )))
+
+# Long table with percentages (boxplot)
+dfbp <- pib2019 %>%
+  select(
+    code_state,va_agro_prop, va_indus_prop, va_servicos_prop, va_adm_pub_prop
+    ) %>%
+  pivot_longer(cols = -code_state) %>%
+  mutate(name = factor(name,
+                       levels = rev(c("va_agro_prop", "va_indus_prop",
+                                  "va_servicos_prop", "va_adm_pub_prop")),
+                       labels = rev(c("Agropecuária", "Indústria", "Serviços",
+                                  "Adm. Pública")))
+         )
+
+# Filter only cities in the State of Sao Paulo
+dfbpsp <- filter(dfbp, code_state == 35)
+
+# Highlight cities as text
+cities_label <- pib2019 %>%
+  filter(code_muni %in% cities) %>%
+  select(
+    name_muni, va_agro_prop, va_indus_prop, va_servicos_prop, va_adm_pub_prop
+    ) %>%
+  pivot_longer(cols = -name_muni) %>%
+  mutate(name = factor(name,
+                       levels = rev(c("va_agro_prop", "va_indus_prop",
+                                  "va_servicos_prop", "va_adm_pub_prop")),
+                       labels = rev(c("Agropecuária", "Indústria", "Serviços",
+                                  "Adm. Pública")))
+         )
+# Group levels into groups using Jenks Algorithm by source per city
+dfperc <- pib2019 %>%
+  select(code_muni, ends_with("prop")) %>%
+  mutate(code_muni = as.character(code_muni)) %>%
+  mutate(across(where(is.numeric), get_jenk_breaks, k = 6)) %>%
+  mutate(across(where(is.numeric), ~ifelse(. > 5, 5, .))) %>%
+  mutate(across(where(is.numeric), as.factor)) %>%
+  pivot_longer(cols = -"code_muni") %>%
+  mutate(
+    name = factor(name,
+                  levels = rev(c("va_agro_prop", "va_indus_prop",
+                                 "va_servicos_prop", "va_adm_pub_prop")),
+                  labels = rev(c("Agropecuária", "Indústria", "Serviços",
+                                 "Adm. Pública")))
+  )
+
+```
+
+```{r geodata-clean}
+# Join GDP data with city shape
+geo <- left_join(munis, pib2019, by = "code_muni")
+geo <- st_make_valid(geo)
+# Simplify shape for quicker plotting
+geo_simples <- ms_simplify(select(geo, va_adm_pub_prop, flag_adm),
+                           keep = 0.05,
+                           keep_shapes = T)
+# Use jenks algorithm to find breaks
+breaks <- BAMMtools::getJenksBreaks(na.omit(pib2019)$va_adm_pub_prop, k = 7)
+
+j <- round(breaks, 2)
+jj <- paste(j, j[-1], sep = " - ")
+jj[length(jj)] <- paste(j[length(j)],
+                        round(max(pib2019$va_adm_pub_prop, na.rm = T), 2),
+                        sep = " - ")
+
+# Public Sector Map
+geo_simples <- mutate(
+  geo_simples,
+  jadm = factor(findInterval(va_adm_pub_prop, breaks))
+)
+
+# Main activity plot
+geoativ <- left_join(munis, atividade, by = "code_muni")
+
+# Facet plot
+#munis <- mutate(munis, code_muni = as.character(code_muni))
+geofacet <- full_join(munis, dfperc, by = "code_muni")
+```
+
+```{r plot-1, echo = F}
+p1 <- ggplot(data = dfbp, aes(x = name, y = value)) +
+  geom_boxplot(aes(fill = name), alpha = 0.9, width = 0.4) +
+  geom_point(
+    data = sample_n(dfbp, size = 0.1 * nrow(dfbp)),
+    aes(x = name, y = value, colour = name),
+    alpha = 0.2,
+    position = position_jitter(width = 0.15)) +
+  geom_text_repel(
+    data = cities_label,
+    aes(x = name, y = value, label = name_muni),
+    size = 2,
+    family = "Helvetica",
+    colour = "gray20",
+    max.overlaps = 20
+  ) +
+  ggdist::stat_halfeye(
+    data = dfbp,
+    aes(x = name,
+        y = value,
+        fill = name),
+    ## adjust bandwidth
+    adjust = .25, 
+    ## adjust height
+    width = .6, 
+    ## move geom to the right
+    justification = -.5, 
+    ## remove slab interval
+    .width = 0, 
+    point_colour = NA
+  ) +
+  scale_fill_manual(
+    name = "%PIB (valor adicionado)",
+    #values = met.brewer(name = "Redon", n = 4),
+    values = met.brewer(name = "Renoir")[c(2, 3, 9, 12)]
+  ) +
+  scale_colour_manual(
+    name = "%PIB (valor adicionado)",
+    #values = met.brewer(name = "Redon", n = 4),
+    values = met.brewer(name = "Renoir")[c(2, 3, 9, 12)]
+  ) +
+  
+  scale_y_continuous(
+    limits = c(-10, NA),
+    breaks = seq(0, 100, 10)) +
+  labs(
+    title = "Valor Adicionado nos Municípios do Brasil (2019)",
+    y = "(%)",
+    x = NULL,
+    caption = "Fonte: IBGE (Contas Nacionais). Cores: MetBrewer. Autor: @viniciusoike"
+  ) +
+  coord_flip() +
+  theme_vini
+```
+
+```{r plot-2, echo = FALSE}
+p2 <- ggplot(data = dfbpsp, aes(x = name, y = value)) +
+  geom_boxplot(aes(fill = name), alpha = 0.9, width = 0.4) +
+  geom_point(
+    data = sample_n(dfbpsp, size = 0.4 * nrow(dfbpsp)),
+    aes(x = name, y = value, colour = name),
+    alpha = 0.2,
+    position = position_jitter(width = 0.15)) +
+  ggdist::stat_halfeye(
+    data = dfbpsp,
+    aes(x = name,
+        y = value,
+        fill = name),
+    ## adjust bandwidth
+    adjust = .25, 
+    ## adjust height
+    width = .6, 
+    ## move geom to the right
+    justification = -.5, 
+    ## remove slab interval
+    .width = 0, 
+    point_colour = NA
+  ) +
+  scale_fill_manual(
+    name = "%PIB (valor adicionado)",
+    values = met.brewer(name = "Renoir")[c(2, 3, 9, 12)]
+  ) +
+  scale_colour_manual(
+    name = "%PIB (valor adicionado)",
+    values = met.brewer(name = "Renoir")[c(2, 3, 9, 12)]
+  ) +
+  scale_y_continuous(breaks = seq(0, 100, 10)) +
+  labs(
+    title = "Valor Adicionado nos Municípios de São Paulo (2019)",
+    x = "(%)",
+    y = NULL,
+    caption = "Fonte: IBGE (Contas Nacionais). Cores: MetBrewer. Autor: @viniciusoike"
+  ) +
+  coord_flip() +
+  theme_vini
+```
+
+```{r plot-3}
+p3 <- ggplot() +
+  geom_sf(data = na.omit(geo_simples),
+          aes(fill = jadm),
+          colour = "transparent") +
+    geom_sf(
+      data = geostate,
+      fill = "transparent",
+      colour = "gray75",
+      size = 0.2
+    ) +
+  scale_fill_viridis_d(
+    name = "Paritcipação do\nSetor Público\nno PIB (%)",
+    labels = jj
+  ) +
+  guides(
+    fill = guide_legend(override.aes = list(size = 0.5))
+  ) +
+  labs(
+    title = "Percentual do PIB municipal advindo do Setor Público",
+    caption = "Fonte: IBGE (Contas Nacionais). Autor: @viniciusoike"
+  ) +
+  theme_map +
+  theme(
+    legend.position = c(0.25, 0.55)
+  )
+```
+
+```{r plot-4}
+p4 <- ggplot() +
+  geom_sf(
+    data = na.omit(geo_simples),
+    aes(fill = flag_adm, colour = flag_adm)) +
+  geom_sf(
+    data = geostate,
+    fill = "transparent",
+    colour = "gray") +
+  scale_fill_manual(
+    name = "Municípios com >50%\nPIB de Adm. Pub.",
+    #values = brewer.pal(3, "PuOr")[c(2, 3)],
+    values = c("#F7F7F7", "#2f357c"),
+    labels = c("Menos de 50%", "Mais de 50%")
+    ) +
+  scale_color_manual(
+    name = "Municípios com >50%\nPIB de Adm. Pub.",
+    #values = brewer.pal(3, "PuOr")[c(2, 3)],
+    values = c("#F7F7F7", "#2f357c"),
+    labels = c("Menos de 50%", "Mais de 50%")
+    ) +
+  labs(
+    title = "Municípios Dependentes do Setor Público",
+        caption = "Fonte: IBGE (Contas Nacionais). Autor: @viniciusoike"
+  ) +
+  theme_map +
+  theme(legend.position = c(0.3, 0.25))
+```
+
+```{r}
+p5 <- ggplot() +
+  geom_sf(data = na.omit(geofacet),
+          aes(fill = value),
+          size = 0.1,
+          colour = "transparent") +
+  facet_wrap(~name) +
+  scale_fill_viridis_d(
+    name = "Participação no PIB (%)",
+    labels = c("Muito baixo", "Baixo", "Médio", "Alto", "Muito Alto")
+  ) +
+  labs(
+    title = "Participação dos Setores no PIB (2019)",
+    subtitle = "Participação relativa de cada setor econômico na composição do PIB municipal em 2019.\nA classificação segue o algoritmo de Jenks dentro de cada setor.",
+        caption = "Fonte: IBGE (Contas Nacionais). Autor: @viniciusoike"
+  ) +
+  theme_map +
+  theme(legend.position = "left")
+```
+
+```{r}
+p6 <- ggplot() +
+  geom_sf(data = na.omit(geoativ),
+          aes(fill = class_ativ),
+          colour = "transparent") +
+      geom_sf(
+      data = geostate,
+      fill = "transparent",
+      colour = "gray75",
+      size = 0.2
+    ) +
+  scale_fill_brewer(
+    name = "Atividade com maior\ncontribuição relativan\ao PIB do município",
+    type = "qual", palette = "Paired") +
+  theme_map + 
+  theme(legend.position = "left")
+  
+```
+
+
+
+```{r export}
+plots <- list(p1, p2, p3, p4, p5, p6)
+
+for (i in seq_along(plots)) {
+  name_file <- sprintf("pib_brasil_composicao_p%s.png", i)
+  path_file <- here::here("graphics", "2022_01", name_file)
+  cowplot::save_plot(path_file, plots[[i]], base_height = 5.5)
+}
+```
+
+```{r}
+p1
+```
+
+```{r}
+p2
+```
+
+```{r}
+p3
+```
+
+```{r}
+p4
+```
+
+```{r}
+p5
+```
+
+```{r}
+p6
+```
+

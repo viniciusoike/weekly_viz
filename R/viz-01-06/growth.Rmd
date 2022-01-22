@@ -364,7 +364,14 @@ plots <- list(p1, p2, p3, p4, p5)
 for (i in seq_along(plots)) {
   name_file <- sprintf("p%s.png", i)
   path_file <- here::here("graphics", "2022_01", name_file)
-  cowplot::save_plot(path_file, plots[[i]])
+  
+  if (i > 2) {
+    cowplot::save_plot(path_file, plots[[i]], base_height = 5.5)
+  } else {
+    cowplot::save_plot(path_file, plots[[i]])
+  }
+  
+  
 }
 
 ```
