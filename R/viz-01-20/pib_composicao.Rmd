@@ -215,7 +215,7 @@ p1 <- ggplot(data = dfbp, aes(x = name, y = value)) +
   geom_text_repel(
     data = cities_label,
     aes(x = name, y = value, label = name_muni),
-    size = 2,
+    size = 3,
     family = "Helvetica",
     colour = "gray20",
     max.overlaps = 20
@@ -389,8 +389,12 @@ p6 <- ggplot() +
       colour = "gray75",
       size = 0.2
     ) +
+  labs(
+    title = "Atividade com maior participação no PIB municipal",
+    subtitle = "Considera apenas a atividade econômica com maior participação no PIB municipal (2019)."
+  ) +
   scale_fill_brewer(
-    name = "Atividade com maior\ncontribuição relativan\ao PIB do município",
+    name = "Atividade com maior\ncontribuição relativa\nao PIB do município",
     type = "qual", palette = "Paired") +
   theme_map + 
   theme(legend.position = "left")
