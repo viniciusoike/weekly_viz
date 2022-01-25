@@ -44,12 +44,11 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 ## GDP Composition by City
 
 
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/pib_brasil_composicao_p1.png?raw=true)
 
-![https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/pib_brasil_composicao_p1.png?raw=true]
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/pib_brasil_composicao_p5.png?raw=true)
 
-![https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/pib_brasil_composicao_p5.png?raw=true]
-
-![https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/pib_brasil_composicao_p6.png?raw=true]
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/pib_brasil_composicao_p6.png?raw=true)
 
 ## Recessions in Brazil
 
