@@ -8,6 +8,8 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 
 ## January
 
+- [City GDP](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-01-20/pib_composicao.Rmd)
+
 - [Recessions in Brazil](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-01-13)
 
 - [Growth in Brazil and Latin America](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-01-06)
@@ -38,6 +40,16 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 ***
 
 # Plots
+
+## GDP Composition by City
+
+
+
+![https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/pib_brasil_composicao_p1.png?raw=true]
+
+![https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/pib_brasil_composicao_p5.png?raw=true]
+
+![https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/pib_brasil_composicao_p6.png?raw=true]
 
 ## Recessions in Brazil
 
