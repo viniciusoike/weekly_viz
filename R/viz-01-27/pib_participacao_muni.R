@@ -1,3 +1,7 @@
+
+# Preamble ----------------------------------------------------------------
+
+# Libraries
 library(geobr)
 library(sf)
 library(here)
@@ -5,10 +9,12 @@ library(tidyverse)
 library(MetBrewer)
 library(showtext)
 
+# Showtext
 font_add("Gill Sans", "GillSans.ttc")
 showtext_auto()
 showtext_opts(dpi = 300)
 
+# Plot theme
 theme_map <- theme_void() +
   theme(
     text = element_text(family = "Gill Sans", size = 10, colour = "gray10"),
@@ -29,7 +35,7 @@ theme_map <- theme_void() +
     plot.background = element_rect(fill = "#fff7bc", color = "#fff7bc")
   )
 
-# Colo scheme
+# Color scheme
 cores <- met.brewer("Hokusai1", n = 27, type = "continuous")
 
 
@@ -142,6 +148,40 @@ p2 <- ggplot() +
   labs(
     title = "Concentração do PIB no Brasil",
     subtitle = "Para chegar em 90% do PIB nacional precisamos somar a produção de 1.308 municípios (23,5% do total).",
+    caption = "Fonte: IBGE (Contas Nacionais 2019). Cores: MetBrewer. Autor: @viniciusoike"
+  ) +
+  guides(color = "none") +
+  theme_map
+
+
+# Map 3 -------------------------------------------------------------------
+
+ggplot() +
+  geom_sf(
+    data = geostate,
+    size = 0.3,
+    color = "gray20",
+    fill = "gray95"
+  ) +
+  geom_sf(
+    data = filter(geo, code_muni %in% pib10),
+    aes(size = pib_perc, color = code_state),
+    alpha = 0.8
+  ) +
+  coord_sf(xlim = c(NA, -34.5)) + 
+  scale_size_continuous(
+    name = "Participação no PIB (%)",
+    breaks = c(0.005, 0.01, 0.05, 0.1),
+    labels = c(0.5, 1, 5, 10),
+    range = c(0, 1)
+  ) +
+  #scale_color_viridis_d() +
+  scale_color_manual(
+    values = cores
+  ) +
+  labs(
+    title = "Concentração do PIB no Brasil",
+    subtitle = "Quase 50% do PIB do Brasil é produzido 71 municípios (1,2% do total).\nSão Paulo é a cidade com maior participação no PIB (10,3%).",
     caption = "Fonte: IBGE (Contas Nacionais 2019). Cores: MetBrewer. Autor: @viniciusoike"
   ) +
   guides(color = "none") +

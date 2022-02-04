@@ -49,8 +49,32 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 
 # Plots
 
+## People, Houses, and Jobs in Capital Cities
+
+* Job growth stagnates in the post 2011-2 period in most cities.
+* Houses grow faster than population for all cities due to a variety of factors: aging population forming families; smaller families (i.e. more houses per person); larger demand for real-estate as an investment.
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_02/people_houses_jobs_panel.png?raw=true)
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_02/people_houses_jobs_southeast.png?raw=true)
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_02/people_houses_census_Southeast.png?raw=true)
+
+## GDP concentration in Brazil
+
+* All economies exhibit spatial concentration of productive activities. In Brazil, 1,2% of its wealthiest cities contribute to half of the country's GDP.
+* The majority of these cities are located along Brazil's coastline.
+* Even going up to 90% requires including only less than a quarter of Brazil's cities. 
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/mapa_concentracao_50.png?raw=true)
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/mapa_concentracao_90.png?raw=true)
+
 ## GDP Composition by City
 
+* Brazil is mostly a services economy, despite its exports being focused on primary goods (commodities).
+* Public sector spending has a large impact on many cities specially in the northeastern region.
+* Both agriculture and services exhibit some spatial concentration; industrial cities, on the other hand, seem very disperse throught Brazil.
 
 ![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_01/pib_brasil_composicao_p1.png?raw=true)
 
