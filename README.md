@@ -6,7 +6,15 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 
 # 2022
 
+## February
+
+- [Real GDP per capita](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-02-11/pib_per_capita_real.R)
+
+- [Homes, People, and Jobs in Capital Cities](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-02-04/homes_people_jobs.R)
+
 ## January
+
+- [City GDP Distribution](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-01-27/pib_participacao_muni.R)
 
 - [City GDP](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-01-20/pib_composicao.Rmd)
 

@@ -2,79 +2,48 @@ library(geobr)
 library(sf)
 library(here)
 library(tidyverse)
-library(rmapshaper)
-library(RColorBrewer)
 library(MetBrewer)
 library(showtext)
-library(ggrepel)
-library(ggtext)
 
 font_add("Gill Sans", "GillSans.ttc")
-font_add("Helvetica", "Helvetica.ttc")
 showtext_auto()
 showtext_opts(dpi = 300)
 
-theme_vini <- theme(
-  
-  text = element_text(family = "Helvetica", size = 10, colour = "gray15"),
-  plot.title = element_text(size = 14),
-  plot.subtitle = element_text(size = 8, colour = "gray30"),
-  plot.caption = element_text(size = 7, colour = "gray30"),
-  
-  
-  legend.title.align = 0.5,
-  legend.title = element_text(size = 8, colour = "gray15"),
-  
-  legend.position = "bottom",
-  panel.background = element_rect(fill = "white"),
-  
-  panel.grid.major.x = element_line(colour = "gray75", size = 0.5, linetype = 2),
-  axis.ticks = element_blank()
-)
-
-
-theme_map <- theme_void() + 
+theme_map <- theme_void() +
   theme(
-    # Adjust plot margins
-    plot.margin = margin(t = 0.5, b = 0.5, unit = "in"),
-    
-    # Text, title and subtitle
-    
     text = element_text(family = "Gill Sans", size = 10, colour = "gray10"),
-    strip.text = element_text(size = 14, hjust = 0.5),
+    
     plot.title = element_text(
       face = "bold", size = 16, hjust = 0.5, colour = "black"
     ),
-    plot.subtitle = element_text(size = 8, hjust = 0.5, colour = "gray20"),
+    plot.subtitle = element_text(size = 12, hjust = 0.5, colour = "gray20"),
     plot.caption = element_text(size = 6),
     # Legend
-    legend.title.align = 0.5,
     legend.margin = margin(0, unit = "pt"),
     legend.box.margin = margin(0, unit = "pt"),
     legend.title = element_text(size = 8),
     legend.text = element_text(size = 6),
-    legend.justification = c(1, 1),
-    legend.background = element_rect(colour = NA, fill = NA),
-    
+    legend.position = c(0.15, 0.25),
     # Background
     panel.background = element_rect(fill = "#fff7bc", color = "#fff7bc"),
-    plot.background = element_rect(fill = "#fff7bc", color = "#fff7bc"),
+    plot.background = element_rect(fill = "#fff7bc", color = "#fff7bc")
   )
 
-get_jenk_breaks <- function(x, k) {
-  
-  j <- BAMMtools::getJenksBreaks(x, k = k)
-  rank <- findInterval(x, j)
-  
-  return(rank)
-}
+# Colo scheme
+cores <- met.brewer("Hokusai1", n = 27, type = "continuous")
 
 
+# Data ------------------------------------------------------------------
+
+# Shapes
 munis <- read_municipality()
 munis <- mutate(munis, code_muni = as.character(code_muni))
 geostate <- read_state()
 
 data <- read_csv(here("data/2022_01/pib_clean.csv"))
+
+
+## Clean -------------------------------------------------------------------
 
 pib_share <- data %>%
   filter(ano == 2019) %>%
@@ -97,49 +66,94 @@ pib50 <- pib_share %>%
   filter(pib >= limit50) %>%
   pull(code_muni)
 
-pib50 <- pib_share %>%
+pib90 <- pib_share %>%
   filter(pib >= limit90) %>%
   pull(code_muni)
-
-library(sf)
 
 points <- munis %>%
   st_make_valid() %>%
   st_centroid()
 
+points <- mutate(points, code_muni = as.numeric(code_muni))
 
+geo <- left_join(points, pib_share, by = "code_muni")
 
 
 # Maps --------------------------------------------------------------------
 
 ## Map 1 -------------------------------------------------------------------
 
-# Library
-library(cartography)
-library(sp)
+p1 <- ggplot() +
+  geom_sf(
+    data = geostate,
+    size = 0.3,
+    color = "gray20",
+    fill = "gray95"
+  ) +
+  geom_sf(
+    data = filter(geo, code_muni %in% pib50),
+    aes(size = pib_perc, color = code_state),
+    alpha = 0.8
+  ) +
+  coord_sf(xlim = c(NA, -34.5)) + 
+  scale_size_continuous(
+    name = "Participação no PIB (%)",
+    breaks = c(0.005, 0.01, 0.05, 0.1),
+    labels = c(0.5, 1, 5, 10),
+    range = c(0, 20)
+  ) +
+  #scale_color_viridis_d() +
+  scale_color_manual(
+    values = cores
+  ) +
+  labs(
+    title = "Concentração do PIB no Brasil",
+    subtitle = "Quase 50% do PIB do Brasil é produzido 71 municípios (1,2% do total).\nSão Paulo é a cidade com maior participação no PIB (10,3%).",
+    caption = "Fonte: IBGE (Contas Nacionais 2019). Cores: MetBrewer. Autor: @viniciusoike"
+  ) +
+  guides(color = "none") +
+  theme_map
 
-# Upload data attached with the package.
-data(nuts2006)
+## Map 2 -------------------------------------------------------------------
 
-# Now we have a geospatial object called nuts2.spdf containing the shape of european regions. We can plot it with the plot function.
-# summary(nuts2.spdf)
+p2 <- ggplot() +
+  geom_sf(
+    data = geostate,
+    size = 0.3,
+    color = "gray20",
+    fill = "gray95"
+  ) +
+  geom_sf(
+    data = filter(geo, code_muni %in% pib90),
+    aes(size = pib_perc, color = code_state),
+    alpha = 0.8
+  ) +
+  coord_sf(xlim = c(NA, -34.5)) + 
+  scale_size_continuous(
+    name = "Participação no PIB (%)",
+    breaks = c(0.005, 0.01, 0.05, 0.1),
+    labels = c(0.5, 1, 5, 10),
+    range = c(0, 20)
+  ) +
+  #scale_color_viridis_d() +
+  scale_color_manual(
+    values = cores
+  ) +
+  labs(
+    title = "Concentração do PIB no Brasil",
+    subtitle = "Para chegar em 90% do PIB nacional precisamos somar a produção de 1.308 municípios (23,5% do total).",
+    caption = "Fonte: IBGE (Contas Nacionais 2019). Cores: MetBrewer. Autor: @viniciusoike"
+  ) +
+  guides(color = "none") +
+  theme_map
 
-# We also have a dataframe with information concerning every region.
-# head(nuts2.df)
-# Both object have a first column "id" that makes the link between them.
 
-# Plot Europe
-plot(nuts0.spdf, border = NA, col = NA, bg = "#A6CAE0")
-plot(world.spdf, col = "#E3DEBF", border = NA, add = TRUE)
-plot(nuts0.spdf, col = "#D1914D", border = "grey80",  add = TRUE)
+# Export ------------------------------------------------------------------
 
-# Add circles proportional to the total population
-propSymbolsLayer(spdf = nuts0.spdf, df = nuts0.df,
-                 var = "pop2008", symbols = "circle", col = "#920000",
-                 legend.pos = "right", legend.title.txt = "Total\npopulation (2008)",
-                 legend.style = "c")
+cowplot::save_plot(here("graphics", "2022_01", "mapa_concentracao_50.png"),
+                   p1,
+                   base_height = 6)
 
-# Add titles, legend...
-layoutLayer(title = "Countries Population in Europe",
-            author = "cartography", sources = "Eurostat, 2008",
-            scale = NULL, south = TRUE)
+cowplot::save_plot(here("graphics", "2022_01", "mapa_concentracao_90.png"),
+                   p2,
+                   base_height = 6)

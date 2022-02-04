@@ -349,6 +349,24 @@ plot_historical <- function(region_code) {
   
 }
 
+panel <- ggplot(filter(data, code_region != 1),
+       aes(x = ano, y = value, colour = index)) +
+  #geom_point() +
+  geom_line(size = 1.1) +
+  geom_hline(yintercept = 100, color = "gray20") +
+  labs(
+    x = NULL,
+    y = "Index (100 = values in 2000)",
+    title = "People, Houses, and Jobs",
+    subtitle = "Evolution of population, household, and formal jobs in capital cities in Brazil. Omits capital cities from the northern region.",
+    caption = "Source: IBGE (Censo, Estimativas da População, PNADC) e MTE (RAIS)."
+  ) +
+  facet_wrap(~name_muni) +
+  scale_x_continuous(breaks = seq(2000, 2020, 5)) +
+  scale_y_continuous(breaks = seq(100, 260, 20)) +
+  scale_color_manual(name = "", values = colors) +
+  theme_vini
+
 plots_historic <- lapply(1:5, plot_historical)
 plots <- lapply(1:5, plot_full)
 
@@ -439,4 +457,15 @@ plot_jobs <- ggplot(filter(data, index == "Jobs", name_muni != "Boa Vista"),
   scale_x_continuous(breaks = 2000:2020) +
   theme_vini
 
+cowplot::save_plot(
+  here("graphics", "2022_02", "jobs.png"),
+  plot_jobs,
+  base_height = 5
+)
+
+cowplot::save_plot(
+  here("graphics", "2022_02", "people_houses_jobs_panel.png"),
+  panel,
+  base_height = 7
+)
   
