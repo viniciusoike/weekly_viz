@@ -8,6 +8,8 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 
 ## February
 
+- [Births and Deaths]()
+
 - [Real GDP per capita](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-02-11/pib_per_capita_real.R)
 
 - [Homes, People, and Jobs in Capital Cities](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-02-04/homes_people_jobs.R)
@@ -48,6 +50,8 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 ***
 
 # Plots
+
+## Births and Deaths
 
 ## People, Houses, and Jobs in Capital Cities
 

@@ -240,7 +240,7 @@ subpop <- subpop %>%
   mutate(value = zoo::na.spline(value),
          index_pop = value / first(value) * 100) %>%
   ungroup() %>%
-  select(ano, code_muni, index_pop)
+  select(ano, code_muni, total_pop = value, index_pop)
 
 # Join with household data
 domi <- mutate(domi,
@@ -263,7 +263,7 @@ subdomi_imp <- subdomi_imp %>%
   group_by(code_muni) %>%
   mutate(index_domi = imputed / first(imputed) * 100) %>%
   ungroup() %>%
-  select(ano, code_muni, index_domi)
+  select(ano, code_muni, total_domi = imputed, index_domi)
 
 # No need for imputation for job values
 jobs <- left_join(grid, rais, by = c("ano", "code_muni"))
@@ -273,12 +273,16 @@ jobs <- jobs %>%
   arrange(code_muni) %>%
   group_by(code_muni) %>%
   mutate(index_jobs = value / first(value) * 100) %>%
-  select(ano, code_muni, index_jobs)
+  select(ano, code_muni, total_jobs = value, index_jobs)
 
 # Merge population, houses, and jobs
 data <- reduce(list(subpop, subdomi_imp, jobs), inner_join)
+write_csv(data, here("data", "homes_people_jobs_capitals.csv"))
 # Convert to long
-data <- pivot_longer(data, cols = -c("ano", "code_muni"), names_to = "index")
+data <- data %>%
+  select(ano, code_muni, starts_with("index")) %>%
+  pivot_longer(cols = -c(ano, code_muni),
+               names_to = "index")
 # Join with IBGE geographic IDs
 data <- left_join(data, geoid, by = "code_muni")
 # Remame factors
@@ -289,7 +293,6 @@ data <- mutate(data,
                  index == "index_pop"  ~ "People"
                ),
                name_muni = factor(name_muni, levels = geoid$name_muni))
-
 
 # Plots -------------------------------------------------------------------
 
