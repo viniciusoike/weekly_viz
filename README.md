@@ -53,6 +53,15 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 
 ## Births and Deaths
 
+* As a result of Covid-19, the number of naturally caused deaths (i.e. non-violent) surpassed the number of births.
+* Age of death distribution is left-skewed so the average is less than the median.
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_02/births_deaths.png?raw=true)
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_02/age_of_death.png?raw=true)
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_02/age_of_death_distribution.gif?raw=true)
+
 ## People, Houses, and Jobs in Capital Cities
 
 * Job growth stagnates in the post 2011-2 period in most cities.
