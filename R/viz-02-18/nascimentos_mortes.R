@@ -174,6 +174,10 @@ anim <- ggplot(data = mort_year, aes(x = grupo_idade, y = mortes_year)) +
   geom_col(fill = cores[1]) +
   coord_flip() +
   labs(title = "Year: {frame_time}", x = NULL, y = "Deaths", caption = "Source: IBGE") +
+  scale_y_continuous(
+    breaks = seq(0, 150000, 25000),
+    labels = format(seq(0, 150000, 25000), big.mark = ".")
+  ) +
   theme_vini +
   transition_time(year, range = c(2003L, 2020L)) +
   ease_aes("linear")
