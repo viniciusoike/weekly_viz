@@ -194,8 +194,6 @@ cowplot::save_plot(here("graphics/2022_02/age_of_death_distribution.png"),
 anim_save(here("graphics/2022_02/age_of_death_distribution.gif"),
           animation = anim)
 
-
-
 # Fitting Deaths ----------------------------------------------------------
 
 # mort19 <- mort_year %>%
