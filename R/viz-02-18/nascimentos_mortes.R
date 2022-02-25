@@ -141,6 +141,7 @@ p2 <- ggplot(tbl_stats, aes(x = date, y = value, colour = name)) +
   labs(
     title = "Age of Death in Brazil",
     y = "Median Age of Death",
+    x = NULL,
     caption = "Source: IBGE"
   ) +
   theme_vini
@@ -170,9 +171,10 @@ p3 <- ggplot(data = mort_compare,
   theme_vini
 
 anim <- ggplot(data = mort_year, aes(x = grupo_idade, y = mortes_year)) +
-  geom_col() +
+  geom_col(fill = cores[1]) +
   coord_flip() +
-  labs(title = "year: {frame_time}", x = NULL, y = "Obitos") +
+  labs(title = "Year: {frame_time}", x = NULL, y = "Deaths", caption = "Source: IBGE") +
+  theme_vini +
   transition_time(year, range = c(2003L, 2020L)) +
   ease_aes("linear")
 
