@@ -3,6 +3,7 @@ library(lubridate)
 library(MetBrewer)
 library(showtext)
 library(tidyverse)
+library(gganimate)
 
 font_add("Helvetica", "Helvetica.ttc")
 showtext_auto()
@@ -88,6 +89,9 @@ morte_med <- tbl_mort %>%
 
 # Join estimates into single data.frame
 tbl_stats <- inner_join(morte_avg, morte_med, by = "date")
+tbl_stats <- tbl_stats %>%
+  pivot_longer(cols = -date) %>%
+  mutate(name = factor(name, labels = c("Average", "Median")))
 
 # Aggregate deaths by year and age_group for gif
 mort_year <- tbl_mort %>%
@@ -105,7 +109,7 @@ mort_compare <- mort_year %>%
 
 cores <- met.brewer("Hokusai1")[c(2, 6)]
 
-ggplot(data$data, aes(x = date, y = log(value), colour = name, group = name)) +
+p1 <- ggplot(data$data, aes(x = date, y = log(value), colour = name, group = name)) +
   geom_line(size = 1) +
   scale_colour_manual(
     name = "",
@@ -123,16 +127,19 @@ ggplot(data$data, aes(x = date, y = log(value), colour = name, group = name)) +
     caption = "Source: IBGE") +
   theme_vini
 
-ggplot(tbl_stats, aes(x = date, y = idade_med)) +
-  geom_line(size = 1,
-            color = cores[1]) +
+p2 <- ggplot(tbl_stats, aes(x = date, y = value, colour = name)) +
+  geom_line(size = 1) +
   scale_x_date(
     breaks = c(as.Date("2003-01-01"),
                seq(as.Date("2005-01-01"), as.Date("2020-01-01"), "5 year")),
     date_labels = "%Y"
   ) +
+  scale_color_manual(
+    name = "",
+    values = cores
+  ) +
   labs(
-    title = "Median Age of Death in Brazil",
+    title = "Age of Death in Brazil",
     y = "Median Age of Death",
     caption = "Source: IBGE"
   ) +
@@ -140,7 +147,7 @@ ggplot(tbl_stats, aes(x = date, y = idade_med)) +
 
 cores2 <- met.brewer("Hokusai1", n = 9)[c(6, 2)]
 
-ggplot(data = mort_compare,
+p3 <- ggplot(data = mort_compare,
        aes(x = grupo_idade, y = value, fill = as.factor(year))) +
   geom_col(position = "dodge") +
   geom_hline(yintercept = 0,
@@ -162,12 +169,32 @@ ggplot(data = mort_compare,
   coord_flip() +
   theme_vini
 
-ggplot(data = mort_year, aes(x = grupo_idade, y = mortes_year)) +
+anim <- ggplot(data = mort_year, aes(x = grupo_idade, y = mortes_year)) +
   geom_col() +
   coord_flip() +
   labs(title = "year: {frame_time}", x = NULL, y = "Obitos") +
   transition_time(year, range = c(2003L, 2020L)) +
   ease_aes("linear")
+
+
+# Export ------------------------------------------------------------------
+
+cowplot::save_plot(here("graphics/2022_02/births_deaths.png"),
+                   p1,
+                   dpi = 300)
+
+cowplot::save_plot(here("graphics/2022_02/age_of_death.png"),
+                   p2,
+                   dpi = 300)
+
+cowplot::save_plot(here("graphics/2022_02/age_of_death_distribution.png"),
+                   p3,
+                   dpi = 300)
+
+anim_save(here("graphics/2022_02/age_of_death_distribution.gif"),
+          animation = anim)
+
+
 
 # Fitting Deaths ----------------------------------------------------------
 
