@@ -8,6 +8,8 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 
 ## February
 
+- [Births and Wedding Rates](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-02-25/births_weddings.R)
+
 - [Births and Deaths](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-02-18/nascimentos_mortes.R)
 
 - [Real GDP per capita](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-02-11/pib_per_capita_real.R)
@@ -50,6 +52,15 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 ***
 
 # Plots
+
+## Births and Weddings
+
+* Wedding rates have been relatively stable across the past 20 years. There has been a recent decline in weddings due to Covid-19 (data end in dec/20)
+* Birth rates fall more clearly across all states.
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_02/births_weddings.png?raw=true)
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_02/births_weddings_avg_age.png?raw=true)
 
 ## Births and Deaths
 
