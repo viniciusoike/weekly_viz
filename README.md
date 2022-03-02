@@ -57,6 +57,7 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 
 * Wedding rates have been relatively stable across the past 20 years. There has been a recent decline in weddings due to Covid-19 (data end in dec/20)
 * Birth rates fall more clearly across all states.
+* The average age at which women have children rose by almost 6 years across all states.
 
 ![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_02/births_weddings.png?raw=true)
 

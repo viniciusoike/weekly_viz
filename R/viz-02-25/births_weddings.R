@@ -108,7 +108,7 @@ p1 <- ggplot(tbl_rates, aes(x = date, y = ma, colour = name)) +
   ) + 
   labs(
     title = "While wedding rates stabilize, birth rate falls",
-    subtitle = "12 month moving average shows steady decline in the birth rate.\nWedding rates stay roughly equal until the Covid-19 pandemic.",
+    subtitle = "12 month moving average shows steady decline in the birth rate. Wedding rates stay roughly equal until the Covid-19 pandemic.",
     y = "Rate per 100.000",
     x = NULL,
     caption = "Source: IBGE"
@@ -127,7 +127,7 @@ p2 <- ggplot(tbl_avg, aes(x = date, y = ma6, colour = name)) +
   ) +
   labs(
     title = "Women are having children and marrying at older ages",
-    subtitle = "Average age of wedding lags significantly behind even when including\nweddings from formerly divorced of widowed.",
+    subtitle = "Average age of wedding lags significantly behind even when including weddings from formerly divorced or widowed.",
     x = NULL,
     y = "Age",
     caption = "Source: IBGE"
