@@ -6,6 +6,10 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 
 # 2022
 
+## March
+
+- [Long-run trends in GDP](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-03-04/longrun_gdp.R)
+
 ## February
 
 - [Births and Wedding Rates](https://github.com/viniciusoike/weekly_viz/blob/main/R/viz-02-25/births_weddings.R)
@@ -52,6 +56,12 @@ Most of my visualizations are about economics, Brazil, and São Paulo.
 ***
 
 # Plots
+
+## Long-run Trends in GDP
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_03/series_gdp_growth.png?raw=true)
+
+![](https://github.com/viniciusoike/weekly_viz/blob/main/graphics/2022_03/panel_decade.png?raw=true)
 
 ## Births and Weddings
 
