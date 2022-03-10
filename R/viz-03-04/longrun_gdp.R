@@ -1,5 +1,6 @@
 library(tidyverse)
 library(here)
+library(ggrepel)
 source(here("R/theme.R"))
 
 # Import downloaded data from Ipeadata
@@ -9,8 +10,8 @@ longpop <- read_csv2(here("data/2022_03/pop_brasil.csv"))
 
 # Data Clean --------------------------------------------------------------
 
-names(longpib) <- c("year", "chg_pib")
-names(longpop) <- c("year", "pop")
+names(longpib) <- c("year", "chg_pib", "")
+names(longpop) <- c("year", "pop", "")
 
 longpib <- longpib %>%
   select(year, chg_pib) %>%
@@ -90,7 +91,7 @@ p4 <- ggplot(filter(longpop, year >= 1900), aes(x = year, y = pop / 10^6)) +
   geom_line(size = 1, color = "#224b5e") +
   scale_x_continuous(breaks = seq(1900, 2020, 20)) +
   scale_y_continuous(breaks = seq(0, 220, 20)) +
-  labs(title = "Resident Population Growth",
+  labs(title = "Resident Population",
        y = "Inhabitants (millions)",
        x = NULL,
        caption = "Source: Ipeadata (years between Census are interpolated with cubic spline)") +
@@ -104,13 +105,24 @@ p5 <- longpop %>%
   geom_col(fill = "#224b5e") +
   scale_x_continuous(breaks = seq(1900, 2020, 20)) +
   scale_y_continuous(breaks = seq(0, 3, 0.5)) +
-  labs(title = "Resident Population Growth",
+  labs(title = "Resident Population Yearly Growth",
        y = "Inhabitants (millions)",
        x = NULL,
        caption = "Source: Ipeadata (years between Census are interpolated with cubic spline)") +
   theme_vini
-  
-p6 <- ggplot(longpib, aes(x = chg_pib * 100)) +
+
+p6 <- ggplot(filter(longpop, year >= 1900), aes(x = year, y = chg_pop * 100)) +
+  geom_hline(yintercept = 0) +
+  geom_line(size = 1, color = "#224b5e") +
+  scale_x_continuous(breaks = seq(1900, 2020, 20)) +
+  scale_y_continuous(breaks = seq(0, 3, 0.5)) +
+  labs(title = "Resident Population Yearly Growth",
+       y = "(%)",
+       x = NULL,
+       caption = "Source: Ipeadata (years between Census are interpolated with cubic spline)") +
+  theme_vini
+
+p7 <- ggplot(longpib, aes(x = chg_pib * 100)) +
   geom_vline(xintercept = 0) +
   geom_histogram(color = "white", fill = "#224b5e") +
   geom_hline(yintercept = 0) +
@@ -130,7 +142,8 @@ plots <- list(cumgdp_decade = p2,
               series_gdp_growth = p3,
               series_pop = p4,
               pop_growth = p5,
-              gdp_distribution = p6)
+              pop_growth_percent = p6,
+              gdp_distribution = p7)
 
 for (i in seq_along(plots)) {
   name_file <- sprintf("%s.png", names(plots)[[i]])
