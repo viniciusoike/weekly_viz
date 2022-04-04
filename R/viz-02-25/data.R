@@ -98,6 +98,9 @@ data <- inner_join(data, tbl_pop_adult, by = c("year", "name_state"))
 
 state_id <- geobr::read_state()
 state_id <- sf::st_drop_geometry(state_id)
+state_id <- mutate(state_id, name_state = str_replace(name_state,
+                                                      "Espirito Santo",
+                                                      "Espírito Santo"))
 
 data <- data %>%
   mutate(name_state = str_to_title(name_state)) %>%
