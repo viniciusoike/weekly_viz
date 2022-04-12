@@ -1,6 +1,9 @@
 library(here)
 library(tidyverse)
 library(readxl)
+library(sidrar)
+
+info_sidra(2612)
 
 # Import data -------------------------------------------------------------
 
