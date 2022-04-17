@@ -3,3 +3,9 @@
 .RData
 .Ruserdata
 .rds
+data/2022_04/dados2019_v1.0_20200116.gpkg
+data/temp/bis_rppi_detailed.xlsx
+data/temp/bis_rppi_selected.xlsx
+data/temp_data.rds
+data/temp_data.rds
+packages.csv
