@@ -6,6 +6,7 @@ library(WDI)
 library(MetBrewer)
 library(showtext)
 font_add_google("Montserrat", "Montserrat")
+showtext_opts(dpi = 300)
 showtext_auto()
 source(here("R/theme.R"))
 
@@ -113,31 +114,28 @@ tbl_wide_lr <- tbl_nominal %>%
   left_join(select(wdi_names, country, iso3c)) %>%
   mutate(highlight = factor(if_else(country == "World", 1, 0)))
 
-
 sel <- c("Australia", "United States", "Japan", "Germany", "Austria", "France")
 sel_latam <- c("Chile", "Brazil", "Peru", "Mexico", "Colombia")
 
-ggplot(filter(tbl, country == "United States"),
+p1 <- ggplot(filter(tbl, country == "United States"),
        aes(x = year, y = value, color = index)) +
   geom_line(size = 1) +
   scale_color_manual(
     values = colors,
     name = "",
     labels = c("Real House Prices", "Population", "Adult Pop.")) +
+  labs(
+    title = "Over the long-run, house price seemed to follow pop. growth",
+    y = "Index (2010 = 100)",
+    x = NULL,
+    caption = "Source: Real House Price Indexes (BIS), Population (UN).\nAdult Pop. defined as population from 20-44 years."
+  ) +
   theme_vini
-
-ggplot(tbl,
-       aes(x = year, y = value, colour = index)) +
-  geom_line(size = 1) +
-  facet_wrap(~country) +
-  guides(color = "none") +
-  theme_vini
-
 
 sel_conforme <- c("Singapore", "Belgium", "France", "Japan", "Korea", "Italy")
 sel_acima <- c("Switzerland", "Hong Kong SAR", "Chile", "India", "Malaysia", "Estonia")
 
-ggplot(filter(tbl, country %in% sel_conforme, year >= 2000),
+p2 <- ggplot(filter(tbl, country %in% sel_conforme, year >= 2000),
        aes(x = year, y = value, colour = index)) +
   geom_line(size = 1) +
   geom_hline(yintercept = 100, linetype = 2, color = "gray60") +
@@ -153,7 +151,7 @@ ggplot(filter(tbl, country %in% sel_conforme, year >= 2000),
        caption = "Source: Real House Price Indexes (BIS), Population (UN).\nAdult Pop. defined as population from 20-44 years.") +
   theme_vini
 
-ggplot(filter(tbl, country %in% sel_acima, year >= 2000),
+p3 <- ggplot(filter(tbl, country %in% sel_acima, year >= 2000),
        aes(x = year, y = value, colour = index)) +
   geom_line(size = 1) +
   geom_hline(yintercept = 100, linetype = 2, color = "gray60") +
@@ -169,7 +167,7 @@ ggplot(filter(tbl, country %in% sel_acima, year >= 2000),
        caption = "Source: Real House Price Indexes (BIS), Population (UN).\nAdult Pop. defined as population from 20-44 years.") +
   theme_vini
 
-ggplot(filter(tbl, country %in% sel_latam, year >= 2000),
+p4 <- ggplot(filter(tbl, country %in% sel_latam, year >= 2000),
        aes(x = year, y = value, colour = index)) +
   geom_line(size = 1) +
   geom_hline(yintercept = 100, linetype = 2, color = "gray60") +
@@ -185,9 +183,7 @@ ggplot(filter(tbl, country %in% sel_latam, year >= 2000),
        caption = "Source: Real House Price Indexes (BIS), Population (UN).\nAdult Pop. defined as population from 20-44 years.") +
   theme_vini
 
-
-
-ggplot(data = na.omit(tbl_wide),
+p5 <- ggplot(data = na.omit(tbl_wide),
        aes(x = index_pop, y = index_house)) +
   geom_hline(yintercept = 0) +
   geom_vline(xintercept = 0) +
@@ -205,4 +201,11 @@ ggplot(data = na.omit(tbl_wide),
     caption = "Source: Real House Price Indexes (BIS), Population (UN).") +
   theme_vini
 
+plots <- list(p1, p2, p3, p4, p5)
 
+for (i in seq_along(plots)) {
+  
+  name_file <- sprintf("house_prices_population_p%s.png", i)
+  cowplot::save_plot(here("graphics/2022_04", name_file), plot = plots[[i]])
+  
+}
