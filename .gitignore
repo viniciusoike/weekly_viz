@@ -10,3 +10,4 @@ data/temp_data.rds
 data/temp_data.rds
 packages.csv
 data/temp_data.rds
+*.rds
