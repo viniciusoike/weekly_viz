@@ -11,3 +11,5 @@ data/temp_data.rds
 packages.csv
 data/temp_data.rds
 *.rds
+.DS_Store
+data/.DS_Store
