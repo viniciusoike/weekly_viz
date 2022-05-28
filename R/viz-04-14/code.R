@@ -209,3 +209,8 @@ for (i in seq_along(plots)) {
   cowplot::save_plot(here("graphics/2022_04", name_file), plot = plots[[i]])
   
 }
+
+
+
+
+# str_detect(string, fixed("pattern", ignore_case = TRUE))
